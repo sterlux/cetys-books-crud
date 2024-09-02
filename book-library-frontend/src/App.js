@@ -4,6 +4,7 @@ import BookForm from "./components/BookForm";
 
 function App() {
   const [books, setBooks] = useState([]);
+  const [selectedBook, setSelectedBook] = useState(null);
 
   useEffect(() => {
     fetchBooks();
@@ -30,11 +31,38 @@ function App() {
     setBooks(books.filter((book) => book.id !== id));
   };
 
+  const updateBook = async (book) => {
+    const response = await fetch(`/api/books/${book.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(book),
+    });
+    const updatedBook = await response.json();
+    setBooks(books.map((b) => (b.id === updatedBook.id ? updatedBook : b)));
+  };
+
+  const selectBookToUpdate = (book) => {
+    setSelectedBook(book);
+  };
+
+  const clearSelection = () => {
+    setSelectedBook(null);
+  };
+
   return (
     <div className="App">
       <h1>Book Library</h1>
-      <BookForm addBook={addBook} />
-      <BookList books={books} deleteBook={deleteBook} />
+      <BookForm
+        addBook={addBook}
+        selectedBook={selectedBook}
+        updateBook={updateBook}
+        clearSelection={clearSelection}
+      />
+      <BookList
+        books={books}
+        deleteBook={deleteBook}
+        selectBookToUpdate={selectBookToUpdate}
+      />
     </div>
   );
 }

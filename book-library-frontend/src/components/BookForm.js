@@ -1,14 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-function BookForm({ addBook }) {
+function BookForm({ addBook, selectedBook, updateBook, clearSelection }) {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
 
+  useEffect(() => {
+    if (selectedBook) {
+      setTitle(selectedBook.title);
+      setAuthor(selectedBook.author);
+    }
+  }, [selectedBook]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    addBook({ title, author });
+    if (selectedBook) {
+      updateBook({ id: selectedBook.id, title, author });
+    } else {
+      addBook({ title, author });
+    }
     setTitle("");
     setAuthor("");
+    clearSelection();
   };
 
   return (
@@ -27,7 +39,7 @@ function BookForm({ addBook }) {
         onChange={(e) => setAuthor(e.target.value)}
         required
       />
-      <button type="submit">Add Book</button>
+      <button type="submit">{selectedBook ? "Update Book" : "Add Book"}</button>
     </form>
   );
 }
